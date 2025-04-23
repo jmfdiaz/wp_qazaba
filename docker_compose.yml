@@ -1,0 +1,52 @@
+version: '3.1'
+
+services:
+
+  web:
+    image: wordpress:php7.4
+    container_name: wordpressc
+    depends_on:
+      - db
+    ports:
+      - "8000:80"
+    environment:
+      - WORDPRESS_DB_HOST=mysqlc
+      - WORDPRESS_DB_NAME=wp_database
+      - WORDPRESS_DB_USER=wp_user
+      - WORDPRESS_DB_PASSWORD=wp_password
+    volumes:
+      - ./target:/var/www/html
+    networks:
+      - wordpress-net
+
+  db:
+    image: mysql:5.7
+    container_name: mysqlc
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=wp_database
+      - MYSQL_USER=wp_user
+      - MYSQL_PASSWORD=wp_password
+    volumes:
+      - wordpress_mysql:/var/lib/mysql
+    networks:
+      - wordpress-net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - wordpress-net
+
+volumes:
+  wordpress_mysql:
+
+networks: 
+  wordpress-net:
